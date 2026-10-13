@@ -14,6 +14,8 @@ List every defect you found in the starter `app/main.py` (helpers and endpoints)
 | 8 | `compute_work_hours` | Uses Python's built-in `round(..., 2)`. | Python uses "banker's rounding" (round to even), which violates R4's explicit half-up requirement. | Replaced with `decimal.Decimal` and `quantize` using `ROUND_HALF_UP`. |
 | 9 | `list_attendance` | Fetches the entire result set into memory (`list(...)`) before sorting and paginating in Python. | High memory usage (OOM) and massive latency on the grader's 100k-record collection. | Chained `.sort()`, `.skip()`, and `.limit()` on the MongoDB cursor directly. |
 
-Also note anything you looked at and decided was **not** a defect, and why.
-- **Handling of absent/leave records:** The starter doesn't populate `ABSENT`/`LEAVE` defaults in `punch_in`, but this isn't a defect because `punch_in` only allows `PRESENT`, `WFH`, and `ON_DUTY`. `ABSENT` and `LEAVE` are only created by seeded back-office data or corrections.
-- **Default value for `shift_end` (18:30):** This is valid since the OpenAPI schema allows `09:30` and `18:30` as default values for shift start and end.
+## Items Reviewed but Not Considered Defects
+
+- **Handling of absent/leave records:** The starter does not create `ABSENT` or `LEAVE` records through `punch_in`. This is intentional, not a defect: the OpenAPI contract restricts punch-in statuses to `PRESENT`, `WFH`, and `ON_DUTY`, and explicitly states that `ABSENT`/`LEAVE` records come from seeded data or corrections. No endpoint is required to create these records.
+
+- **Default value for `shift_end` (18:30):** This is not a defect. The `EmployeeCreate` schema in `openapi.yaml` explicitly defines `09:30` as the default `shift_start` and `18:30` as the default `shift_end`.
